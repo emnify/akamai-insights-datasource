@@ -80,7 +80,8 @@
     "tslib": "2.5.3"
   },
   "overrides": {
-    "prismjs": "1.30.0"
+    "prismjs": "1.30.0",
+    "minimatch": "^10.2.1"
   },
   "packageManager": "npm@10.2.5"
 }
