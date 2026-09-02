@@ -26,6 +26,11 @@ work/
 ci/
 e2e-results/
 
+# Packaged plugin archives (built in CI; must not be committed — a committed
+# <id>-<version>.zip makes the release `zip` append into it, producing a second
+# root dir and failing plugin-validator with "Archive contains more than one directory")
+*.zip
+
 # Editor
 .idea
 
