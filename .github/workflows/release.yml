@@ -19,6 +19,9 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Use HTTPS instead of SSH for GitHub git deps
+        run: git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
+
       - uses: grafana/plugin-actions/build-plugin@main
         with:
           go-version: 1.24
