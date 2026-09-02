@@ -31,7 +31,7 @@ describe('DatasourceService', () => {
       fetch: () => of({ data: [ 'test ' ] })
     }));
 
-    DatasourceService.discoveryApi(1, '/reporting-reports-executor-api/v2/reports/delivery/traffic')
+    DatasourceService.discoveryApi('test-uid', '/reporting-reports-executor-api/v2/reports/delivery/traffic')
       .subscribe({
         next: data => {
           expect(data).toEqual([ 'test ' ]);
@@ -46,7 +46,7 @@ describe('DatasourceService', () => {
       fetch: () => of({ data: { reports: [] } })
     }));
 
-    DatasourceService.reportsApi(1)
+    DatasourceService.reportsApi('test-uid')
       .subscribe({
         next: data => {
           expect(data).toEqual({ reports: [] } );

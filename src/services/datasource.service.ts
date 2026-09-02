@@ -67,7 +67,7 @@ export class DatasourceService extends DataSourceWithBackend<MyQuery, MyDataSour
     this.variables = new QueryVariableSupport(this) as any;
   }
 
-  static discoveryApi(id: number, targetUrl: string): Observable<DiscoveryApiModel> {
+  static discoveryApi(uid: string, targetUrl: string): Observable<DiscoveryApiModel> {
     if (DatasourceService.cachedDiscoveryAPIMap.has(targetUrl)) {
       return of(DatasourceService.cachedDiscoveryAPIMap.get(targetUrl) as DiscoveryApiModel)
         .pipe(
@@ -76,7 +76,7 @@ export class DatasourceService extends DataSourceWithBackend<MyQuery, MyDataSour
     }
 
     return DatasourceService.makeBackendSrvCall<DiscoveryApiModel>({
-      url: `${DatasourceService.getBackendDataSourceUrl(id)}/${DatasourceService.DISCOVERY}`,
+      url: `${DatasourceService.getBackendDataSourceUrl(uid)}/${DatasourceService.DISCOVERY}`,
       params: {
         targetUrl
       }
@@ -85,9 +85,9 @@ export class DatasourceService extends DataSourceWithBackend<MyQuery, MyDataSour
     );
   }
 
-  static reportsApi(id: number): Observable<ReportsApiModel> {
+  static reportsApi(uid: string): Observable<ReportsApiModel> {
     return DatasourceService.makeBackendSrvCall({
-      url: `${DatasourceService.getBackendDataSourceUrl(id)}/${DatasourceService.REPORTS}`
+      url: `${DatasourceService.getBackendDataSourceUrl(uid)}/${DatasourceService.REPORTS}`
     });
   }
 
@@ -99,12 +99,12 @@ export class DatasourceService extends DataSourceWithBackend<MyQuery, MyDataSour
       ) as any as Observable<T>;
   }
 
-  private static getBackendDataSourceUrl(id: number): string {
-    return `/api/datasources/${id}/resources`;
+  private static getBackendDataSourceUrl(uid: string): string {
+    return `/api/datasources/uid/${uid}/resources`;
   }
 
   async testDatasource(): Promise<TestDataSourceResponse> {
-    const source$ = DatasourceService.reportsApi(this.id!)
+    const source$ = DatasourceService.reportsApi(this.uid)
       .pipe(
         map(data => this.createTestDataSourceResponse(data ? TestDataSourceResponseStatus.Success : TestDataSourceResponseStatus.Error)),
         catchError(() => of(this.createTestDataSourceResponse(TestDataSourceResponseStatus.Error)))
@@ -132,7 +132,7 @@ export class DatasourceService extends DataSourceWithBackend<MyQuery, MyDataSour
       const fetchObservable = (getBackendSrv()
         .fetch<Record<string, any>>({
           method: 'POST',
-          url: `${DatasourceService.getBackendDataSourceUrl(this.id!)}/${DatasourceService.DATA}`,
+          url: `${DatasourceService.getBackendDataSourceUrl(this.uid)}/${DatasourceService.DATA}`,
           data: {
             body: interpolatedBody,
             from: from.toISOString(),
@@ -146,7 +146,7 @@ export class DatasourceService extends DataSourceWithBackend<MyQuery, MyDataSour
 
       return forkJoin([
         fetchObservable,
-        DatasourceService.discoveryApi(this.id as number, reportLink || '') as any as Observable<DiscoveryApiModel>
+        DatasourceService.discoveryApi(this.uid, reportLink || '') as any as Observable<DiscoveryApiModel>
       ]).pipe(
         map(([ fetchResponse, discoveryApiModel ]: [FetchResponse<Record<string, any>>, DiscoveryApiModel]) => ({
           data: [ DatasourceService.convertToDataFrame(fetchResponse.data?.data, discoveryApiModel, refId, dimensions) ]
